@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <title>Virtual Remote</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    .volume {
+      margin-bottom: 30px;
+    }
+
+    .mouse {
+      margin-bottom: 50px;
+    }
+
+    .mousepad {
+      width: 100%;
+      background: #ccc;
+      height: 220px;
+      margin-bottom: 20px;
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="mouse">
+  <div class="mousepad"></div>
+  <button class="btn btn-block btn-default btn-lg" data-type="click" data-action="">Click</button>
+</div>
+
+<div class="container-fluid volume">
+  <div class="row">
+    <div class="col-xs-4">
+      <button class="btn btn-block btn-default btn-lg" data-type="volume" data-action="+">+</button>
+      <button class="btn btn-block btn-default btn-lg" data-type="volume" data-action="-">-</button>
+    </div>
+
+    <div class="col-xs-4">
+      <button class="btn btn-block btn-default btn-lg" data-type="scroll" data-action="up">^</button>
+      <button class="btn btn-block btn-default btn-lg" data-type="scroll" data-action="down">v</button>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid shortcuts">
+  <div class="row">
+    <div class="col-xs-6">
+      <button class="btn btn-block btn-default btn-lg" data-type="shortcut" data-action="iplayer">iPlayer</button>
+    </div>
+
+    <div class="col-xs-6">
+      <button class="btn btn-block btn-default btn-lg" data-type="shortcut" data-action="netflix">Netflix</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+
+  var start = null;
+  $('.mousepad').bind('touchstart', function(ev) {
+    ev.preventDefault();
+    start = ev.originalEvent.touches[0];
+  });
+
+  $('.mousepad').bind('touchmove', function(ev) {
+    ev.preventDefault();
+    var touch = ev.originalEvent.touches[0];
+    socket.emit('mouse', {x: touch.pageX - start.pageX, y: touch.pageY - start.pageY});
+    start = touch;
+  });
+
+  $('button').click(function() {
+    socket.emit($(this).attr('data-type'), $(this).attr('data-action'));
+  });
+</script>
+</body>
+</html>
